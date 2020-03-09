@@ -1,15 +1,38 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"log"
+)
+
+var token = "1090407046:AAFittPvxi8ZhtDgAu58KDjv0FuJqH66r8I"
+var apiUrl = "https://api.telegram.org/bot" + token + "/"
 
 func main(){
-	r := gin.Default()
+	bot, err := tgbotapi.NewBotAPI(token)
+	if err != nil {
+		log.Panic(err)
+	}
 
-	r.GET("/ping", func(c *gin.Context){
-		c.JSON(200, gin.H{
-			"message": "ping-pong",
-		})
-	})
+	bot.Debug = true
 
-	r.Run()
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	u := tgbotapi.NewUpdate(0)
+	u.Timeout = 60
+
+	updates, err := bot.GetUpdatesChan(u)
+
+	for update := range updates {
+		if update.Message == nil { // ignore any non-Message Updates
+			continue
+		}
+
+		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		msg.ReplyToMessageID = update.Message.MessageID
+
+		bot.Send(msg)
+	}
 }
