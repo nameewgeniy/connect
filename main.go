@@ -41,10 +41,17 @@ func main(){
 
 			// Ответим пользователю его же сообщением
 			reply := Text
-			// Созадаем сообщение
-			msg := tgbotapi.NewMessage(ChatID, reply)
-			// и отправляем его
-			bot.Send(msg)
+
+			if Text == "/connect" {
+				// Созадаем сообщение
+				msg := tgbotapi.NewMessage(ChatID, "Хочешь познакомиться?")
+				bot.Send(msg)
+
+			} else {
+				// Созадаем сообщение
+				msg := tgbotapi.NewMessage(ChatID, reply)
+				bot.Send(msg)
+			}
 		}
 	}
 }
